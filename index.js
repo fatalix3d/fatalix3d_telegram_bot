@@ -44,12 +44,14 @@ const  start = () => {
 
             // 0 - Start (idle)
             case 'start':
+                // Intro msg
                 if (msg.text.toLowerCase() === '/start') {
-                    await bot.sendMessage(chatId, 'Здравствуйте! Это бот для регистрации в очень секретный чат) \n' +
+                    return  bot.sendMessage(chatId, 'Здравствуйте! Это бот для регистрации в очень секретный чат) \n' +
                         'Выберите /register для подачи заявки на регистрацию. \n' +
                         'Выберите /cancel_reg для удаления вашей заявки (для тестов)');
                 }
 
+                // Register
                 if (msg.text.toLowerCase() === '/register') {
 
                     // check registration complete before.
@@ -62,8 +64,15 @@ const  start = () => {
                     return  bot.sendMessage(chatId, 'Введите вашу фамилию :');
                 }
 
+                // Cancel reg
                 if (msg.text.toLowerCase() === '/cancel_reg') {
-
+                    if (!users[chatId]) {
+                        return  bot.sendMessage(chatId, 'Нечего отменять, от вас заявки еще не поступали');
+                    }
+                    else{
+                        users[chatId].Clear();
+                        return  bot.sendMessage(chatId, 'Ваша заявка успешно удалена');
+                    }
                 }
                 break;
 
@@ -142,6 +151,12 @@ const  start = () => {
                 users[chatId].state = 'start';
 
                 return bot.sendMessage(chatId, `${users[chatId].secondName} ${users[chatId].first_name} ${users[chatId].thirdName} Благодарим за регистрацию. Ваша заявка на расмотрении. Гудбай!`);
+                break;
+
+            default :
+                users[chatId].state = 'start';
+                users[chatId].Clear();
+                return  bot.sendMessage(chatId, 'Что-то пошло не так (');
                 break;
         }
     });

@@ -13,6 +13,18 @@ class User {
         this.state = state;
         this.registerComplete = registerComplete;
     }
+
+    // dev : Clear user reg data
+    Clear(){
+        this.firstName = null;
+        this.secondName = null;
+        this.thirdName =null;
+        this.workInfo = null;
+        this.companyInfo = null;
+        this.companyInn = null;
+        this.state = 'start';
+        this.registerComplete = false;
+    }
 }
 
 module.exports = User;
