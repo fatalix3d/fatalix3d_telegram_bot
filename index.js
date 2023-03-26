@@ -1,6 +1,7 @@
 const User = require('./user.js');
-
+const sqlite3 = require('sqlite3').verbose();
 const TelegramApi = require('node-telegram-bot-api');
+
 const token = '6000741658:AAFbDipcdGjFyGvSw1sza5UYIfAnPItNekI';
 const bot = new TelegramApi(token, {polling: true});
 
@@ -13,7 +14,21 @@ bot.setMyCommands([
     {command: '/cancel_reg', description: 'Сбросить регистрацию (dev)'},
 ]);
 
-const  start = () => {
+const start = async () => {
+
+    // создаем базу данных
+    let db = new sqlite3.Database('./data.db');
+
+    // создаем таблицу
+    await db.run('CREATE TABLE IF NOT EXISTS users (id INT, name TEXT)');
+
+    // добавляем данные в таблицу
+    await db.run('INSERT INTO users (id, name) VALUES (?, ?)', [1, 'John']);
+    await db.run('INSERT INTO users (id, name) VALUES (?, ?)', [2, 'Mary']);
+    await db.run('INSERT INTO users (id, name) VALUES (?, ?)', [3, 'Bob']);
+
+    await db.close();
+
     bot.on('message', async msg => {
 
         const text = msg.text;
