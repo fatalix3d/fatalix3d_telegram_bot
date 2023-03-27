@@ -292,7 +292,7 @@ async function exportToExcel() {
         const data = users.map((user) => ({
             id: user.id,
             //chatId: user.chatId,
-            UserID : user.userName,
+            UserID : '@'+user.userName,
             ФИО: user.secondName + ' ' + user.firstName + ' ' + user.thirdName,
             //Фамилия: user.secondName,
             //Отчество: user.thirdName,
