@@ -12,6 +12,7 @@ const Console = require("console");
 
 let users = [];
 const adminId = 'ftx3d';
+const adminId2 = 'anastasiazems';
 
 bot.setMyCommands([
     {command: '/start', description: 'Запуск бота'},
@@ -55,7 +56,7 @@ const start = async () => {
 
             // ADMIN CMD
             if (msg.text.toLowerCase() === '/report') {
-                if(userId === adminId){
+                if(userId === adminId || userId === adminId2){
                     await bot.sendMessage(chatId, 'Подготавливаю отчет в формате excel файла, подождите.');
                     await exportToExcel();
                     const fileId = './users.xlsx'; // Путь к файлу
