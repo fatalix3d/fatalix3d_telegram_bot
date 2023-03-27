@@ -82,12 +82,15 @@ const start = async () => {
 
                     // Cancel reg
                     if (msg.text.toLowerCase() === '/cancel_reg') {
-                        if (!users[chatId]) {
-                            return bot.sendMessage(chatId, 'Нечего отменять, от вас заявки еще не поступали');
-                        } else {
-                            users[chatId].Clear();
-                            return bot.sendMessage(chatId, 'Ваша заявка успешно удалена');
-                        }
+                        //if (!users[chatId]) {
+                        //    return bot.sendMessage(chatId, 'Нечего отменять, от вас заявки еще не поступали');
+                        //} else {
+                        //    users[chatId].Clear();
+                        //    return bot.sendMessage(chatId, 'Ваша заявка успешно удалена');
+                        //}
+
+                        const user = await UserModel.findOne({chatId});
+                        return bot.sendMessage(chatId, `Тебя зовут ${msg.from.first_name}, твои данные в базе ${user.id}, ${user.chatId},${user.first_name},${user.secondName}, ${user.thirdName},${user.workInfo}, ${user.registerComplete}`);
                     }
                     break;
 
