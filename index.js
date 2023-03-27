@@ -90,7 +90,12 @@ const start = async () => {
                         //}
 
                         const user = await UserModel.findOne({chatId});
-                        return bot.sendMessage(chatId, `Тебя зовут ${msg.from.first_name}, твои данные в базе ${user.id}, ${user.chatId},${user.first_name},${user.secondName}, ${user.thirdName},${user.workInfo}, ${user.registerComplete}`);
+                        if(user===null){
+                            return bot.sendMessage(chatId,'Данных не обнаружено');
+                        }
+                        else {
+                            return bot.sendMessage(chatId, `${user.id},${user.chatId},${user.firstName},${user.secondName},${user.thirdName},${user.workInfo},${user.companyInfo},${user.companyInn},${user.state},${user.registerComplete}`);
+                        }
                     }
                     break;
 
@@ -113,7 +118,7 @@ const start = async () => {
                         return bot.sendMessage(chatId, 'Введите ваше имя :');
                     }
 
-                    users[chatId].first_name = msg.text;
+                    users[chatId].firstName = msg.text;
                     users[chatId].state = 'thirdName';
                     return bot.sendMessage(chatId, 'Введите ваше отчество :');
                     break;
@@ -169,7 +174,19 @@ const start = async () => {
                     users[chatId].registerComplete = true;
                     users[chatId].state = 'start';
 
-                    return bot.sendMessage(chatId, `${users[chatId].secondName} ${users[chatId].first_name} ${users[chatId].thirdName} Благодарим за регистрацию. Ваша заявка на расмотрении. Гудбай!`);
+                    // record to db
+                    const user = await UserModel.findOne({chatId});
+                    user.firstName = users[chatId].firstName;
+                    user.secondName = users[chatId].secondName;
+                    user.thirdName = users[chatId].thirdName;
+                    user.workInfo = users[chatId].workInfo;
+                    user.companyInfo = users[chatId].companyInfo;
+                    user.companyInn = users[chatId].companyInn;
+                    user.state = users[chatId].state;
+                    user.registerComplete = users[chatId].registerComplete;
+                    await user.save();
+
+                    return bot.sendMessage(chatId, `${users[chatId].secondName} ${users[chatId].firstName} ${users[chatId].thirdName} Благодарим за регистрацию. Ваша заявка на расмотрении. Гудбай!`);
                     break;
 
                 default :
