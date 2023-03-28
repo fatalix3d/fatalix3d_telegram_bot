@@ -11,8 +11,8 @@ const XLSX = require('xlsx');
 const Console = require("console");
 
 let users = [];
-const adminId = 'ftx3d';
-const adminId2 = 'anastasiazems';
+const adminId = 'anastasiazems';
+const adminId2 = 'ftx3d';
 
 bot.setMyCommands([
     {command: '/start', description: 'Запуск бота'},
@@ -36,6 +36,7 @@ const start = async () => {
         const chatId = msg.chat.id;
         const userId = msg.chat.username;
 
+        console.log(msg);
         try {
             if (msg.text === undefined) {
                 console.log(`bad message from ${chatId}`)
@@ -56,7 +57,15 @@ const start = async () => {
 
             // ADMIN CMD
             if (msg.text.toLowerCase() === '/report') {
-                if(userId === adminId || userId === adminId2){
+                if(userId === adminId){
+                    await bot.sendMessage(chatId, 'Подготавливаю отчет в формате excel файла, подождите.');
+                    await exportToExcel();
+                    const fileId = './users.xlsx'; // Путь к файлу
+                    await  bot.sendDocument(chatId, fileId);
+
+                }
+                else
+                if(userId === adminId2){
                     await bot.sendMessage(chatId, 'Подготавливаю отчет в формате excel файла, подождите.');
                     await exportToExcel();
                     const fileId = './users.xlsx'; // Путь к файлу
@@ -74,6 +83,10 @@ const start = async () => {
                     // Intro msg
                     if (msg.text.toLowerCase() === '/start') {
 
+                        if(userId === 'anastasiazems'){
+                            await bot.sendMessage(chatId, 'Администратор. Вам доступны дополнительные команды. Используйте /report для получения списка заявок');
+                        }
+                        else
                         if(userId === 'ftx3d'){
                             await bot.sendMessage(chatId, 'Администратор. Вам доступны дополнительные команды. Используйте /report для получения списка заявок');
                         }
