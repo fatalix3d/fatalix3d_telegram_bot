@@ -39,10 +39,10 @@ const start = async () => {
 
         console.log(msg);
         try {
-            console.log(msg.username);
-            if(userId === undefined){
-                return bot.sendMessage(chatId, 'Для корректной работы этого бота, пожалуйста заполните поле user id в настройках аккаунта Telegram');
-            }
+            //console.log(msg.username);
+            //if(userId === undefined){
+            //    return bot.sendMessage(chatId, 'Для корректной работы этого бота, пожалуйста заполните поле user id в настройках аккаунта Telegram');
+            //}
 
             if (msg.text === undefined) {
                 console.log(`bad message from ${chatId}`)
@@ -84,12 +84,12 @@ const start = async () => {
             if (msg.text.toLowerCase() === '/invite') {
                 if(userId === adminId){
                     users[chatId].state = 'check_user';
-                    return  bot.sendMessage(chatId, 'Введите имя пользователя, ему будет отправлена ссылка на чат.');
+                    return  bot.sendMessage(chatId, 'Введите id пользователя, ему будет отправлена ссылка на чат.');
                 }
                 else
                 if(userId === adminId2){
                     users[chatId].state = 'check_user';
-                    return  bot.sendMessage(chatId, 'Введите имя пользователя, ему будет отправлена ссылка на чат.');
+                    return  bot.sendMessage(chatId, 'Введите id пользователя, ему будет отправлена ссылка на чат.');
                 }
             }
 
@@ -172,6 +172,7 @@ const start = async () => {
                         if (userExist) {
                             if (userExist.registerComplete) {
                                 userExist.userName = null;
+                                userExist.userId = null;
                                 userExist.firstName = null;
                                 userExist.secondName = null;
                                 userExist.thirdName = null;
@@ -251,12 +252,14 @@ const start = async () => {
 
                 // 6- companyInfo (Компания где вы работаете)
                 case 'companyInn':
+
                     if (!containsInn(msg.text)) {
                         await bot.sendMessage(chatId, 'Некорректное значение (Такого ИНН несуществует!)');
                         return bot.sendMessage(chatId, 'ИНН вашей компании :');
                     }
+
                     users[chatId].userName = userId;
-                    console.log(`asd asd ${userId}`);
+                    users[chatId].userId = msg.from.id;
                     users[chatId].companyInn = msg.text;
                     users[chatId].registerComplete = true;
                     users[chatId].state = 'start';
@@ -267,6 +270,7 @@ const start = async () => {
                     });
 
                     user.userName = users[chatId].userName;
+                    user.userId = users[chatId].userId;
                     user.firstName = users[chatId].firstName;
                     user.secondName = users[chatId].secondName;
                     user.thirdName = users[chatId].thirdName;
@@ -285,7 +289,7 @@ const start = async () => {
 
                     // check in db
                     const userExist = await UserModel.findOne({
-                        where: { userName: `${inviteUserId}` }
+                        where: { userId: `${inviteUserId}` }
                     });
 
                     if(!userExist){
@@ -344,12 +348,12 @@ async function exportToExcel() {
             }
         });
 
-
         // Преобразуем данные в формат, подходящий для записи в файл Excel
         const data = users.map((user) => ({
             id: user.id,
             //chatId: user.chatId,
             UserID : '@'+user.userName,
+            InviteID : user.userId,
             ФИО: user.secondName + ' ' + user.firstName + ' ' + user.thirdName,
             //Фамилия: user.secondName,
             //Отчество: user.thirdName,
