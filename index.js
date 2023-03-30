@@ -13,6 +13,7 @@ const Console = require("console");
 let users = [];
 const adminId = 'anastasiazems';
 const adminId2 = 'ftx3d';
+const secretChat = 'https://t.me/+haatFMX7YQ0yYTYy';
 
 bot.setMyCommands([
     {command: '/start', description: 'Запуск бота'},
@@ -34,10 +35,14 @@ const start = async () => {
 
         const text = msg.text;
         const chatId = msg.chat.id;
-        const userId = msg.chat.username;
+        const userId = msg.userName;
 
         console.log(msg);
         try {
+            if(userId === undefined){
+                return bot.sendMessage(chatId, 'Для корректной работы этого бота, пожалуйста заполните поле user id в настройках аккаунта Telegram');
+            }
+
             if (msg.text === undefined) {
                 console.log(`bad message from ${chatId}`)
                 return bot.sendMessage(chatId, 'Только текст пожалуйста!');
@@ -49,20 +54,19 @@ const start = async () => {
                 users[chatId] = new User(chatId);
                 users[chatId].state = 'start';
                 users[chatId].userName = userId;
-
                 console.log(`user with id ${chatId} added to users list`);
             } else {
                 console.log(`user with id ${chatId} found, state [${users[chatId].state}], register [${users[chatId].registerComplete}]`);
             }
 
             // ADMIN CMD
+            // ----------------------------------------
             if (msg.text.toLowerCase() === '/report') {
                 if(userId === adminId){
                     await bot.sendMessage(chatId, 'Подготавливаю отчет в формате excel файла, подождите.');
                     await exportToExcel();
                     const fileId = './users.xlsx'; // Путь к файлу
                     await  bot.sendDocument(chatId, fileId);
-
                 }
                 else
                 if(userId === adminId2){
@@ -74,8 +78,22 @@ const start = async () => {
                 }
             }
 
+            // ADMIN CMD <SEND INVITE
+            // ----------------------------------------
+            if (msg.text.toLowerCase() === '/invite') {
+                if(userId === adminId){
+                    users[chatId].state = 'check_user';
+                    return  bot.sendMessage(chatId, 'Введите имя пользователя, ему будет отправлена ссылка на чат.');
+                }
+                else
+                if(userId === adminId2){
+                    users[chatId].state = 'check_user';
+                    return  bot.sendMessage(chatId, 'Введите имя пользователя, ему будет отправлена ссылка на чат.');
+                }
+            }
+
             // Global user state
-            // global states =>  1-start, 2-secondName, 3-firstName, 4-thirdName, 5-workInfo, 6- companyInfo, 7-companyInn, 8-complete
+            // global states =>  1-start, 2-secondName, 3-firstName, 4-thirdName, 5-workInfo, 6- companyInfo, 7-companyInn, 8-complete, 9-inviteUser
             switch (users[chatId].state) {
 
                 // 0 - Start (idle)
@@ -84,11 +102,11 @@ const start = async () => {
                     if (msg.text.toLowerCase() === '/start') {
 
                         if(userId === 'anastasiazems'){
-                            await bot.sendMessage(chatId, 'Администратор. Вам доступны дополнительные команды. Используйте /report для получения списка заявок');
+                            await bot.sendMessage(chatId, 'Администратор. Вам доступны дополнительные команды. Используйте /report для получения списка заявок, /invite для отправки пользователю приглашения в чат');
                         }
                         else
                         if(userId === 'ftx3d'){
-                            await bot.sendMessage(chatId, 'Администратор. Вам доступны дополнительные команды. Используйте /report для получения списка заявок');
+                            await bot.sendMessage(chatId, 'Администратор. Вам доступны дополнительные команды. Используйте /report для получения списка заявок, /invite для отправки пользователю приглашения в чат');
                         }
 
                         // check else create db record
@@ -261,6 +279,26 @@ const start = async () => {
 
                     return bot.sendMessage(chatId, `${users[chatId].secondName} ${users[chatId].firstName} ${users[chatId].thirdName} Благодарим за регистрацию. Ваша заявка на расмотрении. Гудбай!`);
 
+                case 'check_user':
+                    const inviteUserId = msg.text;
+
+                    // check in db
+                    const userExist = await UserModel.findOne({
+                        where: { userName: `${inviteUserId}` }
+                    });
+
+                    if(!userExist){
+                        users[chatId].state = 'start';
+                        return  bot.sendMessage(chatId, 'Такого пользователя нет в базе');
+                    }
+                    else{
+                        // check in db
+                        await bot.sendMessage(userExist.chatId, `Здравствуйте, вам пришло приглашение в секретный чат. Ссылка для доступа : ${secretChat}`);
+                        users[chatId].state = 'start';
+                        return bot.sendMessage(chatId, `Уведомление пользователю @${userExist.userName} успешно отправлено`);
+                    }
+                    break;
+
                 default :
                     users[chatId].state = 'start';
                     users[chatId].Clear();
@@ -289,6 +327,11 @@ function containsDigits(str) {
 function containsInn(str){
     const regex =/^(\d{12})$/;
     return regex.test(str);
+}
+
+function checkUserToInvite(input){
+    const regex =/^@[A-Za-z0-9_]{5,}$/;
+    return regex.test(input)
 }
 
 async function exportToExcel() {
