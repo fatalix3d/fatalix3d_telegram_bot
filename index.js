@@ -35,10 +35,11 @@ const start = async () => {
 
         const text = msg.text;
         const chatId = msg.chat.id;
-        const userId = msg.userName;
+        const userId = msg.from.username;
 
         console.log(msg);
         try {
+            console.log(msg.username);
             if(userId === undefined){
                 return bot.sendMessage(chatId, 'Для корректной работы этого бота, пожалуйста заполните поле user id в настройках аккаунта Telegram');
             }
