@@ -1,7 +1,7 @@
 const User = require('./user.js');
 const TelegramApi = require('node-telegram-bot-api');
 
-const token = '6204085451:AAEriDvTAjHmxHQcjt66Q3xgEvsVFQmqE3c';
+const token = '6000741658:AAFbDipcdGjFyGvSw1sza5UYIfAnPItNekI';
 const bot = new TelegramApi(token, {polling: true});
 
 const sequelize = require('./database');
@@ -30,24 +30,30 @@ const start = async () => {
     }
 
     bot.on('contact', (message) => {
-        const chatId = message.chat.id;
-        const phoneNumber = message.contact.phone_number;
-        switch (users[chatId].state) {
-            case 'telephone':
-                users[chatId].telephone = phoneNumber;
-                users[chatId].state = 'aboutChannel';
-                return bot.sendMessage(chatId, 'Откуда узнал о нашем канале:', {
-                    reply_markup: {
-                        keyboard: [
-                            ['От представителя дистрибьютора'],
-                            ['От сотрудника Русагро'],
-                            ['Интернет'],
-                            ['Другое'],
-                        ],
-                        resize_keyboard: true,
-                        one_time_keyboard: true
-                    }
-                });
+        try {
+            const chatId = message.chat.id;
+            const phoneNumber = message.contact.phone_number;
+
+            switch (users[chatId].state) {
+                case 'telephone':
+                    users[chatId].telephone = phoneNumber;
+                    users[chatId].state = 'aboutChannel';
+                    return bot.sendMessage(chatId, 'Откуда узнал о нашем канале:', {
+                        reply_markup: {
+                            keyboard: [
+                                ['От представителя дистрибьютора'],
+                                ['От сотрудника Русагро'],
+                                ['Интернет'],
+                                ['Другое'],
+                            ],
+                            resize_keyboard: true,
+                            one_time_keyboard: true
+                        }
+                    });
+            }
+        }
+        catch (e){
+            Console.log(`ОШИБКА ${e}`);
         }
     });
 
@@ -249,30 +255,39 @@ const start = async () => {
 
                     users[chatId].city = msg.text;
                     users[chatId].state = 'telephone';
+                    return bot.sendMessage(chatId, 'Телефон:');
 
-                    return bot.sendMessage(chatId, 'Телефон:', {
+                // telephone
+                // >>>>>>>>>
+                // telephone
+                case 'telephone':
+                    if(!checkTelephone(msg.text)){
+                        return bot.sendMessage(chatId, 'Телефон:');
+                    }
+
+                    users[chatId].telephone = msg.text;
+                    users[chatId].state = 'aboutChannel';
+
+                    return bot.sendMessage(chatId, 'Откуда узнал о нашем канале:', {
                         reply_markup: {
                             keyboard: [
-                                [{
-                                    text: 'Отправить номер телефона',
-                                    request_contact: true
-                                }]
+                                ['От представителя дистрибьютора'],
+                                ['От сотрудника Русагро'],
+                                ['Интернет'],
+                                ['Другое'],
                             ],
                             resize_keyboard: true,
                             one_time_keyboard: true
                         }
                     });
-
-                // telephone
-                // >>>>>>>>>
-                // telephone
+                    break;
 
                 case 'aboutChannel':
                     switch (msg.text) {
                         case 'От представителя дистрибьютора':
+                            users[chatId].aboutChannel = msg.text;
                             users[chatId].state = 'distributeName';
                             return bot.sendMessage(chatId, 'Какое название у дистрибьютера?');
-                            break
                     }
 
                     users[chatId].aboutChannel = msg.text;
@@ -294,7 +309,7 @@ const start = async () => {
                     user_.telephone = users[chatId].telephone;
                     user_.city = users[chatId].city;
                     user_.aboutChannel = users[chatId].aboutChannel;
-                    user_.aboutChannel = users[chatId].distributeName;
+                    user_.distributeName = users[chatId].distributeName;
                     user_.state = users[chatId].state;
                     user_.registerComplete = users[chatId].registerComplete;
 
@@ -322,7 +337,7 @@ const start = async () => {
                     user.telephone = users[chatId].telephone;
                     user.city = users[chatId].city;
                     user.aboutChannel = users[chatId].aboutChannel;
-                    user.aboutChannel = users[chatId].distributeName;
+                    user.distributeName = users[chatId].distributeName;
                     user.state = users[chatId].state;
                     user.registerComplete = users[chatId].registerComplete;
 
@@ -340,7 +355,7 @@ const start = async () => {
             console.log(users[chatId].state);
 
         } catch (e) {
-            Console.log(e);
+            Console.log(`ОШИБКА ${e}`);
             return bot.sendMessage(chatId, 'Что-то пошло не так (база данных)');
         }
     });
@@ -379,11 +394,12 @@ async function exportToExcel() {
             UserID : '@'+user.userName,
             ФИО: `${user.lastName} ${user.firstName} ${user.middleName}`,
             Город : user.city,
-            Место_работы: user.workInfo,
+            Должность: user.workInfo,
             Компания: user.companyInfo,
             ИНН_компании: user.companyInn,
             Телефон: user.telephone,
             Откуда_узнал : user.aboutChannel,
+            Дистрибьютор: user.distributeName,
         }));
 
         console.log(data);
