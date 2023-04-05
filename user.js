@@ -11,6 +11,7 @@ class User {
         this.telephone = null;
         this.city = null;
         this.aboutChannel = null;
+        this.distributeName = null;
         this.state = null;
         this.registerComplete = false;
     }
@@ -27,6 +28,7 @@ class User {
         this.telephone = null;
         this.city = null;
         this.aboutChannel = null;
+        this.distributeName = null;
         this.state = 'start';
         this.registerComplete = false;
     }

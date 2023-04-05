@@ -14,6 +14,7 @@ const User = sequelize.define('user', {
     telephone: {type: DataTypes.STRING, unique:false, defaultValue : null},
     city: {type: DataTypes.STRING, unique:false, defaultValue : null},
     aboutChannel: {type: DataTypes.STRING, unique:false, defaultValue : null},
+    distributeName: {type: DataTypes.STRING, unique:false, defaultValue : 'нет данных'},
     state: {type: DataTypes.STRING, unique:false, defaultValue : null},
     registerComplete: {type: DataTypes.BOOLEAN, unique:false, defaultValue: false},
 });

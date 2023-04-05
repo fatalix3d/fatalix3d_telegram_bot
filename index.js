@@ -1,7 +1,7 @@
 const User = require('./user.js');
 const TelegramApi = require('node-telegram-bot-api');
 
-const token = '6204085451:AAEriDvTAjHmxHQcjt66Q3xgEvsVFQmqE3c';
+const token = '6000741658:AAFbDipcdGjFyGvSw1sza5UYIfAnPItNekI';
 const bot = new TelegramApi(token, {polling: true});
 
 const sequelize = require('./database');
@@ -258,9 +258,10 @@ const start = async () => {
                     return bot.sendMessage(chatId, 'Откуда узнали о боте? Можете выбратль или написать свой вариант :', {
                         reply_markup: {
                             keyboard: [
-                                [' Google'],
-                                [' Yandex'],
-                                [' Друг подсказал'],
+                                ['От представителя дистрибьютора'],
+                                ['От сотрудника Русагро'],
+                                ['Интернет'],
+                                ['Другое'],
                             ],
                             resize_keyboard: true,
                             one_time_keyboard: true
@@ -268,12 +269,48 @@ const start = async () => {
                     });
 
                 case 'aboutChannel':
+
+                    switch (msg.text){
+                        case 'От представителя дистрибьютора':
+                            users[chatId].state = 'distributeName';
+                            return bot.sendMessage(chatId, 'Название дистрибьютера :');
+                            break
+                    }
+
                     users[chatId].aboutChannel = msg.text;
                     users[chatId].registerComplete = true;
                     users[chatId].state = 'start';
 
                     // record to db
-                    const user = await UserModel.findOne({
+                    const user_ = await UserModel.findOne({
+                        where: { chatId: `${chatId}` }
+                    });
+
+                    user_.userName = users[chatId].userName;
+                    user_.firstName = users[chatId].firstName;
+                    user_.lastName = users[chatId].lastName;
+                    user_.middleName = users[chatId].middleName;
+                    user_.workInfo = users[chatId].workInfo;
+                    user_.companyInfo = users[chatId].companyInfo;
+                    user_.companyInn = users[chatId].companyInn;
+                    user_.telephone = users[chatId].telephone;
+                    user_.city = users[chatId].city;
+                    user_.aboutChannel = users[chatId].aboutChannel;
+                    user_.aboutChannel = users[chatId].distributeName;
+                    user_.state = users[chatId].state;
+                    user_.registerComplete = users[chatId].registerComplete;
+
+                    await user_.save();
+                    return bot.sendMessage(chatId, `${users[chatId].firstName} благодарим за регистрацию. Ваша заявка на расмотрении.`);
+
+                case 'distributeName':
+
+                    users[chatId].distributeName = msg.text;
+                    users[chatId].registerComplete = true;
+                    users[chatId].state = 'start';
+
+                    // record to db
+                    let user = await UserModel.findOne({
                         where: { chatId: `${chatId}` }
                     });
 
@@ -287,13 +324,12 @@ const start = async () => {
                     user.telephone = users[chatId].telephone;
                     user.city = users[chatId].city;
                     user.aboutChannel = users[chatId].aboutChannel;
+                    user.aboutChannel = users[chatId].distributeName;
                     user.state = users[chatId].state;
                     user.registerComplete = users[chatId].registerComplete;
 
                     await user.save();
-
-                    return bot.sendMessage(chatId, `${users[chatId].firstName} благодарим за регистрацию. Ваша заявка на расмотрении. Гудбай!`);
-                    break;
+                    return bot.sendMessage(chatId, `${users[chatId].firstName} благодарим за регистрацию. Ваша заявка на расмотрении.`);
 
 
                 default :
@@ -310,6 +346,10 @@ const start = async () => {
             return bot.sendMessage(chatId, 'Что-то пошло не так (база данных)');
         }
     });
+
+}
+
+async function SaveToDB(user){
 
 }
 
