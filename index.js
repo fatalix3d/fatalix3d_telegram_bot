@@ -1,7 +1,7 @@
 const User = require('./user.js');
 const TelegramApi = require('node-telegram-bot-api');
 
-const token = '6000741658:AAFbDipcdGjFyGvSw1sza5UYIfAnPItNekI';
+const token = '6204085451:AAEriDvTAjHmxHQcjt66Q3xgEvsVFQmqE3c';
 const bot = new TelegramApi(token, {polling: true});
 
 const sequelize = require('./database');
