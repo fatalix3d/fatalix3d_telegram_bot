@@ -124,6 +124,11 @@ const start = async () => {
                             ' с полезной и ценной информацией. Торопись, первые 500 зарегистрировавшихся получат гарантированные' +
                             ' призы, а также шанс выиграть главный приз — 2 билета на фестиваль Gastreet и проживание в отеле!');
 
+                        // Проверка пред. реги
+                        const checkUserReg = await UserModel.findOne({
+                            where: {chatId: `${chatId}`}
+                        });
+
                         users[chatId].state = 'lastName';
 
                         await bot.sendMessage(chatId, 'Для вступления в сообщество нам нужно убедиться, что ты тоже шеф :)');
@@ -270,14 +275,12 @@ const start = async () => {
 
                     return bot.sendMessage(chatId, 'Откуда узнал о нашем канале:', {
                         reply_markup: {
-                            keyboard: [
-                                ['От представителя дистрибьютора'],
-                                ['От сотрудника Русагро'],
-                                ['Интернет'],
-                                ['Другое'],
-                            ],
-                            resize_keyboard: true,
-                            one_time_keyboard: true
+                            inline_keyboard: [
+                                [{ text: 'От представителя дистрибьютора', callback_data: 'dist'}],
+                                [{ text: 'От сотрудника Русагро', callback_data: 'rusagro' }],
+                                [{ text: 'Интернет', callback_data: 'internet' }],
+                                [{ text: 'Другое', callback_data: 'other' }]
+                            ]
                         }
                     });
                     break;
@@ -295,25 +298,7 @@ const start = async () => {
                     users[chatId].state = 'start';
 
                     // record to db
-                    const user_ = await UserModel.findOne({
-                        where: {chatId: `${chatId}`}
-                    });
-
-                    user_.userName = users[chatId].userName;
-                    user_.firstName = users[chatId].firstName;
-                    user_.lastName = users[chatId].lastName;
-                    user_.middleName = users[chatId].middleName;
-                    user_.workInfo = users[chatId].workInfo;
-                    user_.companyInfo = users[chatId].companyInfo;
-                    user_.companyInn = users[chatId].companyInn;
-                    user_.telephone = users[chatId].telephone;
-                    user_.city = users[chatId].city;
-                    user_.aboutChannel = users[chatId].aboutChannel;
-                    user_.distributeName = users[chatId].distributeName;
-                    user_.state = users[chatId].state;
-                    user_.registerComplete = users[chatId].registerComplete;
-
-                    await user_.save();
+                    await SaveToDB(chatId);
                     return bot.sendMessage(chatId, 'Благодарим за регистрацию:) Твоя заявка на рассмотрении.');
 
                 case 'distributeName':
@@ -323,25 +308,7 @@ const start = async () => {
                     users[chatId].state = 'start';
 
                     // record to db
-                    let user = await UserModel.findOne({
-                        where: {chatId: `${chatId}`}
-                    });
-
-                    user.userName = users[chatId].userName;
-                    user.firstName = users[chatId].firstName;
-                    user.lastName = users[chatId].lastName;
-                    user.middleName = users[chatId].middleName;
-                    user.workInfo = users[chatId].workInfo;
-                    user.companyInfo = users[chatId].companyInfo;
-                    user.companyInn = users[chatId].companyInn;
-                    user.telephone = users[chatId].telephone;
-                    user.city = users[chatId].city;
-                    user.aboutChannel = users[chatId].aboutChannel;
-                    user.distributeName = users[chatId].distributeName;
-                    user.state = users[chatId].state;
-                    user.registerComplete = users[chatId].registerComplete;
-
-                    await user.save();
+                    await SaveToDB(chatId);
                     return bot.sendMessage(chatId, 'Благодарим за регистрацию:) Твоя заявка на рассмотрении.');
 
 
@@ -362,8 +329,66 @@ const start = async () => {
 
 }
 
-async function SaveToDB(user){
+bot.on('callback_query', (query) => {
+    const chatId = query.message.chat.id;
+    const data = query.data;
 
+    // обрабатываем callback_data, который был отправлен боту
+    switch (data) {
+        case 'dist':
+            // обрабатываем выбор "От представителя дистрибьютора"
+            users[chatId].aboutChannel = 'От представителя дистрибьютора';
+            users[chatId].state = 'distributeName';
+            return bot.sendMessage(chatId, 'Какое название у дистрибьютера?');
+        case 'rusagro':
+            // обрабатываем выбор "От сотрудника Русагро"
+            users[chatId].aboutChannel = 'От сотрудника Русагро';
+            return bot.sendMessage(chatId, 'Благодарим за регистрацию:) Твоя заявка на рассмотрении.');
+
+        case 'internet':
+            // обрабатываем выбор "Интернет"
+            users[chatId].aboutChannel = 'Интернет';
+            return bot.sendMessage(chatId, 'Благодарим за регистрацию:) Твоя заявка на рассмотрении.');
+
+        case 'other':
+            // обрабатываем выбор "Другое"
+            users[chatId].aboutChannel = 'Другое';
+            return bot.sendMessage(chatId, 'Благодарим за регистрацию:) Твоя заявка на рассмотрении.');
+        default:
+            break;
+    }
+
+    // удаляем inline клавиатуру после обработки выбора
+    bot.answerCallbackQuery(query.id);
+    bot.editMessageReplyMarkup({
+        inline_keyboard: []
+    }, {
+        chat_id: chatId,
+        message_id: query.message.message_id
+    });
+});
+
+async function SaveToDB(chatId){
+// record to db
+    let user = await UserModel.findOne({
+        where: {chatId: `${chatId}`}
+    });
+
+    user.userName = users[chatId].userName;
+    user.firstName = users[chatId].firstName;
+    user.lastName = users[chatId].lastName;
+    user.middleName = users[chatId].middleName;
+    user.workInfo = users[chatId].workInfo;
+    user.companyInfo = users[chatId].companyInfo;
+    user.companyInn = users[chatId].companyInn;
+    user.telephone = users[chatId].telephone;
+    user.city = users[chatId].city;
+    user.aboutChannel = users[chatId].aboutChannel;
+    user.distributeName = users[chatId].distributeName;
+    user.state = users[chatId].state;
+    user.registerComplete = users[chatId].registerComplete;
+
+    await user.save();
 }
 
 start();
