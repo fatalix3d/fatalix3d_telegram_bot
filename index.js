@@ -15,7 +15,7 @@ const adminId2 = 'ftx3d';
 
 bot.setMyCommands([
     {command: '/start', description: 'Запуск бота'},
-    {command: '/register', description: 'Регистрация'},
+    //{command: '/register', description: 'Регистрация'},
     //{command: '/cancel_reg', description: 'Сбросить регистрацию (dev)'},
 ]);
 
@@ -113,10 +113,15 @@ const start = async () => {
                             await UserModel.create({chatId});
                         }
 
-                        return bot.sendMessage(chatId, 'Привет! Я чат-бот сообщества бренда Solpro для профессионалов HoReCa.' +
+                        await bot.sendMessage(chatId, 'Привет! Я чат-бот сообщества бренда Solpro для профессионалов HoReCa.' +
                             ' Заполни форму регистрации и получи доступ к закрытой группе шеф-поваров' +
                             ' с полезной и ценной информацией. Торопись, первые 500 зарегистрировавшихся получат гарантированные' +
                             ' призы, а также шанс выиграть главный приз — 2 билета на фестиваль Gastreet и проживание в отеле!');
+
+                        users[chatId].state = 'lastName';
+
+                        await bot.sendMessage(chatId, 'Для вступления в сообщество нам нужно убедиться, что ты тоже шеф :)');
+                        return bot.sendMessage(chatId, 'Введите Фамилию:');
                     }
 
                     // Register
