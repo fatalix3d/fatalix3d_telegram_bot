@@ -1,7 +1,7 @@
 const User = require('./user.js');
 const TelegramApi = require('node-telegram-bot-api');
 
-const token = '6204085451:AAEriDvTAjHmxHQcjt66Q3xgEvsVFQmqE3cgit';
+const token = '6000741658:AAFbDipcdGjFyGvSw1sza5UYIfAnPItNekI';
 const bot = new TelegramApi(token, {polling: true});
 
 const sequelize = require('./database');
@@ -16,7 +16,7 @@ const adminId2 = 'ftx3d';
 bot.setMyCommands([
     {command: '/start', description: 'Запуск бота'},
     {command: '/register', description: 'Регистрация'},
-    {command: '/cancel_reg', description: 'Сбросить регистрацию (dev)'},
+    //{command: '/cancel_reg', description: 'Сбросить регистрацию (dev)'},
 ]);
 
 const start = async () => {
@@ -35,8 +35,19 @@ const start = async () => {
         switch (users[chatId].state) {
             case 'telephone':
                 users[chatId].telephone = phoneNumber;
-                users[chatId].state = 'city';
-                return bot.sendMessage(chatId, 'Город :');
+                users[chatId].state = 'aboutChannel';
+                return bot.sendMessage(chatId, 'Откуда узнал о нашем канале:', {
+                    reply_markup: {
+                        keyboard: [
+                            ['От представителя дистрибьютора'],
+                            ['От сотрудника Русагро'],
+                            ['Интернет'],
+                            ['Другое'],
+                        ],
+                        resize_keyboard: true,
+                        one_time_keyboard: true
+                    }
+                });
         }
     });
 
@@ -102,9 +113,10 @@ const start = async () => {
                             await UserModel.create({chatId});
                         }
 
-                        return bot.sendMessage(chatId, 'Здравствуйте! Это бот для регистрации в очень секретный чат) \n' +
-                            'Выберите /register для подачи заявки на регистрацию. \n' +
-                            'Выберите /cancel_reg для удаления вашей заявки (для тестов)');
+                        return bot.sendMessage(chatId, 'Привет! Я чат-бот сообщества бренда Solpro для профессионалов HoReCa.' +
+                            ' Заполни форму регистрации и получи доступ к закрытой группе шеф-поваров' +
+                            ' с полезной и ценной информацией. Торопись, первые 500 зарегистрировавшихся получат гарантированные' +
+                            ' призы, а также шанс выиграть главный приз — 2 билета на фестиваль Gastreet и проживание в отеле!');
                     }
 
                     // Register
@@ -132,8 +144,8 @@ const start = async () => {
 
                         users[chatId].state = 'lastName';
 
-                        await bot.sendMessage(chatId, 'Вы подаете заявку на регистрацию, следуйте указаниям бота.');
-                        return bot.sendMessage(chatId, 'Введите фамилию:');
+                        await bot.sendMessage(chatId, 'Для вступления в сообщество нам нужно убедиться, что ты тоже шеф :)');
+                        return bot.sendMessage(chatId, 'Введите Фамилию:');
                     }
 
                     // Cancel reg
@@ -173,65 +185,67 @@ const start = async () => {
                 // 1- Second name (Фамилия)
                 case 'lastName':
                     if (!containsDigits(msg.text)) {
-                        await bot.sendMessage(chatId, 'Некорректное значение');
-                        return bot.sendMessage(chatId, 'Введите фамилию:');
+                        return bot.sendMessage(chatId, 'Введите Фамилию:');
                     }
 
                     users[chatId].lastName = msg.text;
                     users[chatId].state = 'firstName';
-                    return bot.sendMessage(chatId, 'Введите имя:');
+                    return bot.sendMessage(chatId, 'Введите Имя:');
 
                 case 'firstName':
                     if (!containsDigits(msg.text)) {
-                        await bot.sendMessage(chatId, 'Некорректное значение');
-                        return bot.sendMessage(chatId, 'Введите имя:');
+                        return bot.sendMessage(chatId, 'Введите Имя:');
                     }
 
                     users[chatId].firstName = msg.text;
                     users[chatId].state = 'middleName';
-                    return bot.sendMessage(chatId, 'Введите отчество:');
+                    return bot.sendMessage(chatId, 'Введите Отчество:');
 
                 case 'middleName':
                     if (!containsDigits(msg.text)) {
-                        await bot.sendMessage(chatId, 'Некорректное значение');
-                        return bot.sendMessage(chatId, 'Введите отчество:');
+                        return bot.sendMessage(chatId, 'Введите Отчество:');
                     }
 
                     users[chatId].middleName = msg.text;
-                    users[chatId].state = 'workInfo';
-                    return bot.sendMessage(chatId, 'Место работы:');
-
-                // 2 - Кем работает
-                case 'workInfo':
-                    if (msg.text.length < 3) {
-                        return bot.sendMessage(chatId, 'Место работы:');
-                    }
-
-                    users[chatId].workInfo = msg.text;
                     users[chatId].state = 'companyInfo';
-                    return bot.sendMessage(chatId, 'Юридическое лицо организации:');
+                    return bot.sendMessage(chatId, 'Введите компанию, в которой работаете (наименование юридического лица):');
 
-                // 3- Юр название компании, в которой работает
                 case 'companyInfo':
                     if (msg.text.length < 2) {
-                        return bot.sendMessage(chatId, 'Юридическое лицо организации:');
+                        return bot.sendMessage(chatId, 'Введите компанию, в которой работаете (наименование юридического лица):');
                     }
 
                     users[chatId].companyInfo = msg.text;
                     users[chatId].state = 'companyInn';
-                    return bot.sendMessage(chatId, 'Инн организации в которой вы работаете:');
+                    return bot.sendMessage(chatId, 'ИНН компании:');
 
-                // 4 - ИНН: компании в которой работает
                 case 'companyInn':
                     if (!containsInn(msg.text)) {
-                        await bot.sendMessage(chatId, 'Некорректное значение!');
-                        return bot.sendMessage(chatId, 'Инн организации в которой вы работаете:');
+                        return bot.sendMessage(chatId, 'ИНН компании:');
                     }
 
+                    users[chatId].state = 'workInfo';
                     users[chatId].companyInn = msg.text;
+                    return bot.sendMessage(chatId, 'Должность:');
+
+                case 'workInfo':
+                    if (msg.text.length < 3) {
+                        return bot.sendMessage(chatId, 'Должность:');
+                    }
+
+                    users[chatId].workInfo = msg.text;
+                    users[chatId].state = 'city';
+                    return bot.sendMessage(chatId, 'Город:');
+
+                case 'city':
+                    if (msg.text.length < 3) {
+                        return bot.sendMessage(chatId, 'Город:');
+                    }
+
+                    users[chatId].city = msg.text;
                     users[chatId].state = 'telephone';
 
-                    return bot.sendMessage(chatId, 'Для продолжения отправьте свой номер телефона', {
+                    return bot.sendMessage(chatId, 'Телефон:', {
                         reply_markup: {
                             keyboard: [
                                 [{
@@ -244,36 +258,15 @@ const start = async () => {
                         }
                     });
 
-                // telephone get
-
-                // telephone get
-
-                case 'city':
-                    if (msg.text.length < 3) {
-                        return bot.sendMessage(chatId, 'Город :');
-                    }
-
-                    users[chatId].city = msg.text;
-                    users[chatId].state = 'aboutChannel';
-                    return bot.sendMessage(chatId, 'Откуда узнали о боте? Можете выбратль или написать свой вариант :', {
-                        reply_markup: {
-                            keyboard: [
-                                ['От представителя дистрибьютора'],
-                                ['От сотрудника Русагро'],
-                                ['Интернет'],
-                                ['Другое'],
-                            ],
-                            resize_keyboard: true,
-                            one_time_keyboard: true
-                        }
-                    });
+                // telephone
+                // >>>>>>>>>
+                // telephone
 
                 case 'aboutChannel':
-
-                    switch (msg.text){
+                    switch (msg.text) {
                         case 'От представителя дистрибьютора':
                             users[chatId].state = 'distributeName';
-                            return bot.sendMessage(chatId, 'Название дистрибьютера :');
+                            return bot.sendMessage(chatId, 'Какое название у дистрибьютера?');
                             break
                     }
 
@@ -283,7 +276,7 @@ const start = async () => {
 
                     // record to db
                     const user_ = await UserModel.findOne({
-                        where: { chatId: `${chatId}` }
+                        where: {chatId: `${chatId}`}
                     });
 
                     user_.userName = users[chatId].userName;
@@ -301,7 +294,7 @@ const start = async () => {
                     user_.registerComplete = users[chatId].registerComplete;
 
                     await user_.save();
-                    return bot.sendMessage(chatId, `${users[chatId].firstName} благодарим за регистрацию. Ваша заявка на расмотрении.`);
+                    return bot.sendMessage(chatId, 'Благодарим за регистрацию:) Твоя заявка на рассмотрении.');
 
                 case 'distributeName':
 
@@ -311,7 +304,7 @@ const start = async () => {
 
                     // record to db
                     let user = await UserModel.findOne({
-                        where: { chatId: `${chatId}` }
+                        where: {chatId: `${chatId}`}
                     });
 
                     user.userName = users[chatId].userName;
@@ -329,7 +322,7 @@ const start = async () => {
                     user.registerComplete = users[chatId].registerComplete;
 
                     await user.save();
-                    return bot.sendMessage(chatId, `${users[chatId].firstName} благодарим за регистрацию. Ваша заявка на расмотрении.`);
+                    return bot.sendMessage(chatId, 'Благодарим за регистрацию:) Твоя заявка на рассмотрении.');
 
 
                 default :
