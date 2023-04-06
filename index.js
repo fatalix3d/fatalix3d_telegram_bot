@@ -394,7 +394,7 @@ async function SaveToDB(chatId){
 start();
 
 function containsOnlyDigits(str) {
-    return /^\d+$/.test(str);
+    return /^[0-9+]+$/.test(str);
 }
 
 function containsDigits(str) {
