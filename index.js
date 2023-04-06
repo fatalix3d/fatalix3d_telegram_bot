@@ -266,7 +266,7 @@ const start = async () => {
                 // >>>>>>>>>
                 // telephone
                 case 'telephone':
-                    if(!checkTelephone(msg.text)){
+                    if(!containsOnlyDigits(msg.text)){
                         return bot.sendMessage(chatId, 'Телефон:');
                     }
 
@@ -392,6 +392,10 @@ async function SaveToDB(chatId){
 }
 
 start();
+
+function containsOnlyDigits(str) {
+    return /^\d+$/.test(str);
+}
 
 function containsDigits(str) {
     const regex = /^[a-zA-Zа-яА-Я]+$/;
