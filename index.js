@@ -11,7 +11,7 @@ const Console = require("console");
 
 let users = [];
 const adminId = 'anastasiazems';
-const adminId2 = 'ftx3d';
+const adminId2 = 'tati_barabanova';
 
 bot.setMyCommands([
     {command: '/start', description: 'Запуск бота'},
@@ -64,110 +64,98 @@ const start = async () => {
                 }
             }
 
+            // Intro msg
+            if (msg.text.toLowerCase() === '/start') {
+
+                if (userId === adminId || userId === adminId2) {
+                    await bot.sendMessage(chatId, 'Администратор. Вам доступны дополнительные команды. Используйте /report для получения списка заявок и /invite для отправки приглащения');
+                }
+
+
+                // check else create db record
+                const userExist = await UserModel.findOne({
+                    where: {chatId: `${chatId}`}
+                });
+
+                if (userExist) {
+                    Console.log(`запись с таким chatId уже существует`);
+                } else {
+                    Console.log(`запись с таким chatId не существует`);
+                    await UserModel.create({chatId});
+                }
+
+                await bot.sendMessage(chatId, 'Привет! Я чат-бот сообщества бренда Solpro для профессионалов HoReCa. Заполни форму регистрации и получи доступ к закрытой группе шеф-поваров с полезной и ценной информацией!' +
+                    '\n' +
+                    '\n' +
+                    '12 мая у тебя есть шанс выиграть главный приз —  поездку на фестиваль GASTREET! Для вступления в сообщество нам нужно убедиться, что ты тоже шеф :)');
+
+                // Проверка пред. реги
+                const checkUserReg = await UserModel.findOne({
+                    where: {chatId: `${chatId}`}
+                });
+
+                users[chatId].state = 'lastName';
+
+                //await bot.sendMessage(chatId, 'Для вступления в сообщество нам нужно убедиться, что ты тоже шеф :)');
+                return bot.sendMessage(chatId, 'Введите Фамилию:');
+            }
+
+            // Register
+            if (msg.text.toLowerCase() === '/register') {
+
+                // check registration complete before.
+                const userExist = await UserModel.findOne({
+                    where: {chatId: `${chatId}`}
+                });
+
+                // check else create db record
+                if (userExist) {
+                    Console.log(`запись с таким chatId уже существует`);
+                } else {
+                    Console.log(`запись с таким chatId не существует`);
+                    await UserModel.create({chatId});
+                }
+
+                if (userExist) {
+                    Console.log(`запись с таким chatId уже существует`);
+                    if (userExist.registerComplete) {
+                        return bot.sendMessage(chatId, 'Вы уже давали заявку, вы можете выбрать /cancel_reg для удаления текущей заявки.');
+                    }
+                }
+
+                users[chatId].state = 'lastName';
+
+                await bot.sendMessage(chatId, 'Для вступления в сообщество нам нужно убедиться, что ты тоже шеф :)');
+                return bot.sendMessage(chatId, 'Введите Фамилию:');
+            }
+
+            if (msg.text.toLowerCase() === '/invite') {
+                if (userId === adminId || userId === adminId2) {
+                    users[chatId].state = 'invite';
+                    return bot.sendMessage(chatId, 'Введите id:');
+                }
+            }
+
             // Global user state
             switch (users[chatId].state) {
 
-                // 0 - Start (idle)
-                case 'start':
+                // ADMIN ONLY
+                case 'invite':
+                    const inviteUser = await UserModel.findOne({
+                        where: {chatId: `${msg.text}`}
+                    });
 
-                    // Intro msg
-                    if (msg.text.toLowerCase() === '/start') {
+                    if (inviteUser) {
+                        await bot.sendMessage(msg.text, 'Ваша заявка одобрена. Добро пожаловать в чат! Ссылка : https://t.me/+mGI7zFqTLNQyYjZi');
+                        await bot.sendMessage(chatId, 'Приглашение отправлено.');
+                        return bot.sendMessage(chatId, 'Введите id:');
+                    } else {
 
-                        if (userId === adminId || userId === adminId2) {
-                            await bot.sendMessage(chatId, 'Администратор. Вам доступны дополнительные команды. Используйте /report для получения списка заявок');
-                        }
-
-
-                        // check else create db record
-                        const userExist = await UserModel.findOne({
-                            where: {chatId: `${chatId}`}
-                        });
-
-                        if (userExist) {
-                            Console.log(`запись с таким chatId уже существует`);
-                        } else {
-                            Console.log(`запись с таким chatId не существует`);
-                            await UserModel.create({chatId});
-                        }
-
-                        await bot.sendMessage(chatId, 'Привет! Я чат-бот сообщества бренда Solpro для профессионалов HoReCa. Заполни форму регистрации и получи доступ к закрытой группе шеф-поваров с полезной и ценной информацией!' +
-                            '\n' +
-                            '\n' +
-                            '12 мая у тебя есть шанс выиграть главный приз —  поездку на фестиваль GASTREET! Для вступления в сообщество нам нужно убедиться, что ты тоже шеф :)');
-
-                        // Проверка пред. реги
-                        const checkUserReg = await UserModel.findOne({
-                            where: {chatId: `${chatId}`}
-                        });
-
-                        users[chatId].state = 'lastName';
-
-                        //await bot.sendMessage(chatId, 'Для вступления в сообщество нам нужно убедиться, что ты тоже шеф :)');
-                        return bot.sendMessage(chatId, 'Введите Фамилию:');
-                    }
-
-                    // Register
-                    if (msg.text.toLowerCase() === '/register') {
-
-                        // check registration complete before.
-                        const userExist = await UserModel.findOne({
-                            where: {chatId: `${chatId}`}
-                        });
-
-                        // check else create db record
-                        if (userExist) {
-                            Console.log(`запись с таким chatId уже существует`);
-                        } else {
-                            Console.log(`запись с таким chatId не существует`);
-                            await UserModel.create({chatId});
-                        }
-
-                        if (userExist) {
-                            Console.log(`запись с таким chatId уже существует`);
-                            if (userExist.registerComplete) {
-                                return bot.sendMessage(chatId, 'Вы уже давали заявку, вы можете выбрать /cancel_reg для удаления текущей заявки.');
-                            }
-                        }
-
-                        users[chatId].state = 'lastName';
-
-                        await bot.sendMessage(chatId, 'Для вступления в сообщество нам нужно убедиться, что ты тоже шеф :)');
-                        return bot.sendMessage(chatId, 'Введите Фамилию:');
-                    }
-
-                    // Cancel reg
-                    if (msg.text.toLowerCase() === '/cancel_reg') {
-
-                        users[chatId].Clear();
-
-                        const userExist = await UserModel.findOne({
-                            where: {chatId: `${chatId}`}
-                        });
-
-                        if (userExist) {
-                            if (userExist.registerComplete) {
-                                userExist.userName = null;
-                                userExist.firstName = null;
-                                userExist.lastName = null;
-                                userExist.middleName = null;
-                                userExist.workInfo = null;
-                                userExist.companyInfo = null;
-                                userExist.companyInn = null;
-                                userExist.telephone = null;
-                                userExist.city = null;
-                                userExist.aboutChannel = null;
-                                userExist.state = null;
-                                userExist.registerComplete = false;
-                                await userExist.save();
-                                return bot.sendMessage(chatId, 'Ваша заявка успешно удалена');
-                            } else {
-                                return bot.sendMessage(chatId, 'Нечего отменять, от вас заявка еще не поступала');
-                            }
-                        } else {
-                            return bot.sendMessage(chatId, 'Нечего отменять, от вас заявка еще не поступала');
-                        }
+                        await bot.sendMessage(chatId, `Пользователь ${msg.text} не найден`);
+                        return bot.sendMessage(chatId, 'Введите id:');
                     }
                     break;
+
 
                 // 1- Second name (Фамилия)
                 case 'lastName':
@@ -317,7 +305,7 @@ const start = async () => {
 
 }
 
-bot.on('callback_query', (query) => {
+bot.on('callback_query', async  (query) => {
     const chatId = query.message.chat.id;
     const data = query.data;
 
@@ -331,16 +319,25 @@ bot.on('callback_query', (query) => {
         case 'rusagro':
             // обрабатываем выбор "От сотрудника Русагро"
             users[chatId].aboutChannel = 'От сотрудника Русагро';
+            users[chatId].registerComplete = true;
+            users[chatId].state = 'start';
+            await SaveToDB(chatId);
             return bot.sendMessage(chatId, 'Благодарим за регистрацию:) Твоя заявка на рассмотрении.');
 
         case 'internet':
             // обрабатываем выбор "Интернет"
             users[chatId].aboutChannel = 'Интернет';
+            users[chatId].registerComplete = true;
+            users[chatId].state = 'start';
+            await SaveToDB(chatId);
             return bot.sendMessage(chatId, 'Благодарим за регистрацию:) Твоя заявка на рассмотрении.');
 
         case 'other':
             // обрабатываем выбор "Другое"
             users[chatId].aboutChannel = 'Другое';
+            users[chatId].registerComplete = true;
+            users[chatId].state = 'start';
+            await SaveToDB(chatId);
             return bot.sendMessage(chatId, 'Благодарим за регистрацию:) Твоя заявка на рассмотрении.');
     }
 
@@ -408,7 +405,7 @@ async function exportToExcel() {
         // Преобразуем данные в формат, подходящий для записи в файл Excel
         const data = users.map((user) => ({
             id: user.id,
-            UserID : '@'+user.userName,
+            UserID : user.chatId,
             ФИО: `${user.lastName} ${user.firstName} ${user.middleName}`,
             Город : user.city,
             Должность: user.workInfo,
