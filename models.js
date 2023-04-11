@@ -10,6 +10,8 @@ const User = sequelize.define('user', {
     middleName: {type: DataTypes.STRING, unique:false, defaultValue : 'test'},
     workInfo: {type: DataTypes.STRING, unique:false, defaultValue : null},
     companyInfo: {type: DataTypes.STRING, unique:false, defaultValue : null},
+    companyAdres: {type: DataTypes.STRING, unique:false, defaultValue : null},
+    companyLabel: {type: DataTypes.STRING, unique:false, defaultValue : null},
     companyInn: {type: DataTypes.STRING, unique:true, defaultValue : null},
     telephone: {type: DataTypes.STRING, unique:false, defaultValue : null},
     city: {type: DataTypes.STRING, unique:false, defaultValue : null},

@@ -119,10 +119,10 @@ const start = async () => {
                             await UserModel.create({chatId});
                         }
 
-                        await bot.sendMessage(chatId, 'Привет! Я чат-бот сообщества бренда Solpro для профессионалов HoReCa.' +
-                            ' Заполни форму регистрации и получи доступ к закрытой группе шеф-поваров' +
-                            ' с полезной и ценной информацией. Торопись, первые 500 зарегистрировавшихся получат гарантированные' +
-                            ' призы, а также шанс выиграть главный приз — 2 билета на фестиваль Gastreet и проживание в отеле!');
+                        await bot.sendMessage(chatId, 'Привет! Я чат-бот сообщества бренда Solpro для профессионалов HoReCa. Заполни форму регистрации и получи доступ к закрытой группе шеф-поваров с полезной и ценной информацией!' +
+                            '\n' +
+                            '\n' +
+                            '12 мая у тебя есть шанс выиграть главный приз — 2 билета на фестиваль Gastreet и проживание в отеле! Для вступления в сообщество нам нужно убедиться, что ты тоже шеф :)');
 
                         // Проверка пред. реги
                         const checkUserReg = await UserModel.findOne({
@@ -131,7 +131,7 @@ const start = async () => {
 
                         users[chatId].state = 'lastName';
 
-                        await bot.sendMessage(chatId, 'Для вступления в сообщество нам нужно убедиться, что ты тоже шеф :)');
+                        //await bot.sendMessage(chatId, 'Для вступления в сообщество нам нужно убедиться, что ты тоже шеф :)');
                         return bot.sendMessage(chatId, 'Введите Фамилию:');
                     }
 
@@ -232,8 +232,25 @@ const start = async () => {
                     }
 
                     users[chatId].companyInfo = msg.text;
+                    users[chatId].state = 'companyAdres';
+                    return bot.sendMessage(chatId, 'Введите адрес компании:');
+
+                case 'companyAdres':
+                    if (msg.text.length < 2) {
+                        return bot.sendMessage(chatId, 'Введите адрес компании:');
+                    }
+                    users[chatId].companyAdres = msg.text;
+                    users[chatId].state = 'companyLabel';
+                    return bot.sendMessage(chatId, 'Введите название (именно вывеска):');
+
+                case 'companyLabel':
+                    if (msg.text.length < 2) {
+                        return bot.sendMessage(chatId, 'Введите название (именно вывеска):');
+                    }
+                    users[chatId].companyLabel = msg.text;
                     users[chatId].state = 'companyInn';
                     return bot.sendMessage(chatId, 'ИНН компании:');
+                    break;
 
                 case 'companyInn':
                     if (!containsInn(msg.text)) {
@@ -380,6 +397,8 @@ async function SaveToDB(chatId){
     user.middleName = users[chatId].middleName;
     user.workInfo = users[chatId].workInfo;
     user.companyInfo = users[chatId].companyInfo;
+    user.companyAdres = users[chatId].companyAdres;
+    user.companyLabel = users[chatId].companyLabel;
     user.companyInn = users[chatId].companyInn;
     user.telephone = users[chatId].telephone;
     user.city = users[chatId].city;
@@ -425,6 +444,8 @@ async function exportToExcel() {
             Город : user.city,
             Должность: user.workInfo,
             Компания: user.companyInfo,
+            Адрес: user.companyAdres,
+            Вывеска: user.companyLabel,
             ИНН_компании: user.companyInn,
             Телефон: user.telephone,
             Откуда_узнал : user.aboutChannel,

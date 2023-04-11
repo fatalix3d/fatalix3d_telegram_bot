@@ -7,6 +7,8 @@ class User {
         this.middleName = null;
         this.workInfo = null;
         this.companyInfo = null;
+        this.companyAdres = null;
+        this.companyLabel = null;
         this.companyInn = null;
         this.telephone = null;
         this.city = null;
@@ -24,6 +26,8 @@ class User {
         this.middleName = null;
         this.workInfo = null;
         this.companyInfo = null;
+        this.companyAdres = null;
+        this.companyLabel = null;
         this.companyInn = null;
         this.telephone = null;
         this.city = null;
