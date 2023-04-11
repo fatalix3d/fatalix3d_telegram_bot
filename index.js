@@ -29,35 +29,6 @@ const start = async () => {
         console.log(e);
     }
 
-    bot.on('contact', (message) => {
-        try {
-            const chatId = message.chat.id;
-            const phoneNumber = message.contact.phone_number;
-
-            switch (users[chatId].state) {
-                case 'telephone':
-                    users[chatId].telephone = phoneNumber;
-                    users[chatId].state = 'aboutChannel';
-                    return bot.sendMessage(chatId, 'Откуда узнал о нашем канале:', {
-                        reply_markup: {
-                            keyboard: [
-                                ['От представителя дистрибьютора'],
-                                ['От сотрудника Русагро'],
-                                ['Интернет'],
-                                ['Другое'],
-                            ],
-                            resize_keyboard: true,
-                            one_time_keyboard: true
-                        }
-                    });
-            }
-        }
-        catch (e){
-            Console.log(`ОШИБКА ${e}`);
-        }
-    });
-
-
     bot.on('message', async msg => {
 
         const text = msg.text;
@@ -122,7 +93,7 @@ const start = async () => {
                         await bot.sendMessage(chatId, 'Привет! Я чат-бот сообщества бренда Solpro для профессионалов HoReCa. Заполни форму регистрации и получи доступ к закрытой группе шеф-поваров с полезной и ценной информацией!' +
                             '\n' +
                             '\n' +
-                            '12 мая у тебя есть шанс выиграть главный приз — 2 билета на фестиваль Gastreet и проживание в отеле! Для вступления в сообщество нам нужно убедиться, что ты тоже шеф :)');
+                            '12 мая у тебя есть шанс выиграть главный приз —  поездку на фестиваль GASTREET! Для вступления в сообщество нам нужно убедиться, что ты тоже шеф :)');
 
                         // Проверка пред. реги
                         const checkUserReg = await UserModel.findOne({
@@ -340,7 +311,7 @@ const start = async () => {
 
         } catch (e) {
             Console.log(`ОШИБКА ${e}`);
-            return bot.sendMessage(chatId, 'Что-то пошло не так (база данных)');
+            return bot.sendMessage(chatId, `Что-то пошло не так ${e.toString()}`);
         }
     });
 
@@ -371,8 +342,6 @@ bot.on('callback_query', (query) => {
             // обрабатываем выбор "Другое"
             users[chatId].aboutChannel = 'Другое';
             return bot.sendMessage(chatId, 'Благодарим за регистрацию:) Твоя заявка на рассмотрении.');
-        default:
-            break;
     }
 
     // удаляем inline клавиатуру после обработки выбора
