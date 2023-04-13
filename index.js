@@ -64,6 +64,7 @@ const start = async () => {
                     await exportToExcel();
                     const fileId = './users.xlsx'; // Путь к файлу
                     await bot.sendDocument(chatId, fileId);
+                    return;
                 }
 
                 if (userId === adminId2) {
@@ -71,6 +72,7 @@ const start = async () => {
                     await exportToExcel();
                     const fileId = './users.xlsx'; // Путь к файлу
                     await bot.sendDocument(chatId, fileId);
+                    return;
                 }
 
                 if (userId === adminId3) {
@@ -78,6 +80,7 @@ const start = async () => {
                     await exportToExcel();
                     const fileId = './users.xlsx'; // Путь к файлу
                     await bot.sendDocument(chatId, fileId);
+                    return;
                 }
 
                 if (userId === adminId4) {
@@ -85,13 +88,15 @@ const start = async () => {
                     await exportToExcel();
                     const fileId = './users.xlsx'; // Путь к файлу
                     await bot.sendDocument(chatId, fileId);
+                    return;
                 }
 
                 if (userId === adminId5) {
                     await bot.sendMessage(chatId, 'Подготавливаю отчет в формате excel файла, подождите.');
                     await exportToExcel();
                     const fileId = './users.xlsx'; // Путь к файлу
-                    await bot.sendDocument(chatId, fileId);
+                    await  bot.sendDocument(chatId, fileId);
+                    return;
                 }
             }
 
@@ -99,23 +104,23 @@ const start = async () => {
             if (msg.text.toLowerCase() === '/start') {
 
                 if (userId === adminId) {
-                    await bot.sendMessage(chatId, 'Администратор. Вам доступны дополнительные команды. Используйте /report для получения списка заявок и /invite для отправки приглащения');
+                    await bot.sendMessage(chatId, 'Администратор. Вам доступны дополнительные команды. Используйте /report для получения списка заявок и /invite для отправки приглашения');
                 }
 
                 if (userId === adminId2) {
-                    await bot.sendMessage(chatId, 'Администратор. Вам доступны дополнительные команды. Используйте /report для получения списка заявок и /invite для отправки приглащения');
+                    await bot.sendMessage(chatId, 'Администратор. Вам доступны дополнительные команды. Используйте /report для получения списка заявок и /invite для отправки приглашения');
                 }
 
                 if (userId === adminId3) {
-                    await bot.sendMessage(chatId, 'Администратор. Вам доступны дополнительные команды. Используйте /report для получения списка заявок и /invite для отправки приглащения');
+                    await bot.sendMessage(chatId, 'Администратор. Вам доступны дополнительные команды. Используйте /report для получения списка заявок и /invite для отправки приглашения');
                 }
 
                 if (userId === adminId4) {
-                    await bot.sendMessage(chatId, 'Администратор. Вам доступны дополнительные команды. Используйте /report для получения списка заявок и /invite для отправки приглащения');
+                    await bot.sendMessage(chatId, 'Администратор. Вам доступны дополнительные команды. Используйте /report для получения списка заявок и /invite для отправки приглашения');
                 }
 
                 if (userId === adminId5) {
-                    await bot.sendMessage(chatId, 'Администратор. Вам доступны дополнительные команды. Используйте /report для получения списка заявок и /invite для отправки приглащения');
+                    await bot.sendMessage(chatId, 'Администратор. Вам доступны дополнительные команды. Используйте /report для получения списка заявок и /invite для отправки приглашения');
                 }
 
 
@@ -221,7 +226,6 @@ const start = async () => {
                         await bot.sendMessage(chatId, `Пользователь ${msg.text} не найден`);
                         return bot.sendMessage(chatId, 'Введите id:');
                     }
-                    break;
 
 
                 // 1- Second name (Фамилия)
@@ -276,7 +280,6 @@ const start = async () => {
                     users[chatId].companyLabel = msg.text;
                     users[chatId].state = 'companyInn';
                     return bot.sendMessage(chatId, 'ИНН компании:');
-                    break;
 
                 case 'companyInn':
                     if (!containsInn(msg.text)) {
@@ -361,8 +364,6 @@ const start = async () => {
 
 
             }
-            console.log(users[chatId].state);
-
         } catch (e) {
             Console.log(`ОШИБКА ${e}`);
             return bot.sendMessage(chatId, `Что-то пошло не так ${e.toString()}`);
