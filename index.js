@@ -14,6 +14,7 @@ const adminId = 'anastasiazems';
 const adminId2 = 'tati_barabanova';
 const adminId3 = 'korepusik';
 const adminId4 = 'olgalinn';
+const adminId5 = 'ftx3d';
 
 bot.setMyCommands([
     {command: '/start', description: 'Запуск бота'},
@@ -58,7 +59,7 @@ const start = async () => {
 
             // ADMIN CMD
             if (msg.text.toLowerCase() === '/report') {
-                if (userId === adminId || userId === adminId2|| userId === adminId3|| userId === adminId4) {
+                if (userId === adminId || userId === adminId2|| userId === adminId3|| userId === adminId4 || userId === adminId5) {
                     await bot.sendMessage(chatId, 'Подготавливаю отчет в формате excel файла, подождите.');
                     await exportToExcel();
                     const fileId = './users.xlsx'; // Путь к файлу
@@ -69,7 +70,7 @@ const start = async () => {
             // Intro msg
             if (msg.text.toLowerCase() === '/start') {
 
-                if (userId === adminId || userId === adminId2|| userId === adminId3|| userId === adminId4) {
+                if (userId === adminId || userId === adminId2|| userId === adminId3|| userId === adminId4|| userId === adminId5) {
                     await bot.sendMessage(chatId, 'Администратор. Вам доступны дополнительные команды. Используйте /report для получения списка заявок и /invite для отправки приглащения');
                 }
 
@@ -132,7 +133,7 @@ const start = async () => {
             }
 
             if (msg.text.toLowerCase() === '/invite') {
-                if (userId === adminId || userId === adminId2|| userId === adminId3|| userId === adminId4) {
+                if (userId === adminId || userId === adminId2|| userId === adminId3|| userId === adminId4|| userId === adminId5) {
                     users[chatId].state = 'invite';
                     return bot.sendMessage(chatId, 'Введите id:');
                 }
