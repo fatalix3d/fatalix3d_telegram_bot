@@ -12,7 +12,7 @@ const Console = require("console");
 let users = [];
 const adminId = 'anastasiazems';
 const adminId2 = 'tati_barabanova';
-const adminId3 = 'korepusik';
+const adminId3 = 'Korepusik';
 const adminId4 = 'olgalinn';
 const adminId5 = 'ftx3d';
 
