@@ -32,6 +32,8 @@ const start = async () => {
         console.log(e);
     }
 
+    console.log(msg);
+
     bot.on('message', async msg => {
 
         const text = msg.text;
