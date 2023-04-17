@@ -284,12 +284,12 @@ const start = async () => {
                     return bot.sendMessage(chatId, 'ИНН компании:');
 
                 case 'companyInn':
-                    if (!containsInn(msg.text)) {
+                    if (!containsOnlyDigits(msg.text)) {
                         return bot.sendMessage(chatId, 'ИНН компании:');
                     }
 
-                    users[chatId].state = 'workInfo';
                     users[chatId].companyInn = msg.text;
+                    users[chatId].state = 'workInfo';
                     return bot.sendMessage(chatId, 'Должность:');
 
                 case 'workInfo':
