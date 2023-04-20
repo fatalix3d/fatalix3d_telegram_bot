@@ -41,7 +41,7 @@ const start = async () => {
 
         console.log(msg);
 
-        if(userId!=='786922283') {
+        if(userId!=='Indira') {
             return bot.sendMessage(chatId, 'Бот временно не работает');
         }
 
