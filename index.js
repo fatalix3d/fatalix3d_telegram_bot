@@ -18,8 +18,6 @@ const adminId5 = 'ftx3d';
 
 bot.setMyCommands([
     {command: '/start', description: 'Запуск бота'},
-    //{command: '/register', description: 'Регистрация'},
-    //{command: '/cancel_reg', description: 'Сбросить регистрацию (dev)'},
 ]);
 
 const start = async () => {
@@ -38,14 +36,6 @@ const start = async () => {
         const text = msg.text;
         const chatId = msg.chat.id;
         const userId = msg.from.username;
-
-        console.log(msg);
-
-        if(userId!=='maka3d') {
-            return bot.sendMessage(chatId, 'Бот временно не работает');
-        }
-
-        console.log(msg);
 
         try {
 
