@@ -142,7 +142,7 @@ const start = async () => {
                     Console.log(`запись с таким chatId уже существует`);
                 } else {
                     Console.log(`запись с таким chatId не существует`);
-                    await UserModel.findOrCreate({chatId});
+                    await UserModel.findOrCreate({where: {chatId: `${chatId}`}});
                 }
 
                 await bot.sendMessage(chatId, 'Привет! Я чат-бот сообщества бренда Solpro для профессионалов HoReCa. Заполни форму регистрации и получи доступ к закрытой группе с полезной и ценной информацией!' +
