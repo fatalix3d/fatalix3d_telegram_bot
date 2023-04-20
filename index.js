@@ -5,9 +5,11 @@ const token = '6204085451:AAEriDvTAjHmxHQcjt66Q3xgEvsVFQmqE3c';
 const bot = new TelegramApi(token, {polling: true});
 
 const sequelize = require('./database');
+
 const UserModel = require('./models');
 const XLSX = require('xlsx');
 const Console = require("console");
+const { Sequelize } = require('sequelize');
 
 let users = [];
 const adminId = 'anastasiazems';
@@ -425,7 +427,7 @@ async function SaveToDB(chatId){
     });
 
     if(!users[chatId].userName){
-        user.userName = 'нет данных';
+        user.userName = `${chatId}`;
     }
     else{
         user.userName = users[chatId].userName;
@@ -446,7 +448,18 @@ async function SaveToDB(chatId){
     user.state = users[chatId].state;
     user.registerComplete = users[chatId].registerComplete;
 
-    await user.save();
+    //await user.save();
+
+    try {
+        await user.save();
+    } catch (error) {
+        if (error instanceof Sequelize.UniqueConstraintError) {
+            console.log('Ошибка уникальности:', error);
+            console.log('Запись, вызвавшая ошибку:', user.get());
+        } else {
+            console.log('Произошла другая ошибка:', error);
+        }
+    }
 }
 
 start();
