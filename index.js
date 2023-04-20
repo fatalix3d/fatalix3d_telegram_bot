@@ -39,7 +39,9 @@ const start = async () => {
         const chatId = msg.chat.id;
         const userId = msg.chat.username;
 
-        //return bot.sendMessage(chatId, 'Бот временно не работает');
+        if(userId!=='786922283') {
+            return bot.sendMessage(chatId, 'Бот временно не работает');
+        }
 
         console.log(msg);
 
