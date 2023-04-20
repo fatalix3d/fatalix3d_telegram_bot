@@ -456,6 +456,7 @@ async function SaveToDB(chatId){
         if (error instanceof Sequelize.UniqueConstraintError) {
             console.log('Ошибка уникальности:', error);
             console.log('Запись, вызвавшая ошибку:', user.get());
+            return bot.sendMessage(chatId, 'Такой ИНН уже есть в базе, заявка отклонена.');
         } else {
             console.log('Произошла другая ошибка:', error);
         }
