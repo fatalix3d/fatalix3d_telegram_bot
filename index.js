@@ -273,9 +273,6 @@ const start = async () => {
                     return bot.sendMessage(chatId, 'Введите название (именно вывеска):');
 
                 case 'companyLabel':
-                    if (msg.text.length < 7) {
-                        return bot.sendMessage(chatId, 'Введите название (именно вывеска):');
-                    }
                     users[chatId].companyLabel = msg.text;
                     users[chatId].state = 'companyInn';
                     return bot.sendMessage(chatId, 'ИНН компании:');
