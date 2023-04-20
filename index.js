@@ -38,6 +38,9 @@ const start = async () => {
         const text = msg.text;
         const chatId = msg.chat.id;
         const userId = msg.chat.username;
+
+        //return bot.sendMessage(chatId, 'Бот временно не работает');
+
         console.log(msg);
 
         try {
@@ -135,7 +138,7 @@ const start = async () => {
                     Console.log(`запись с таким chatId уже существует`);
                 } else {
                     Console.log(`запись с таким chatId не существует`);
-                    await UserModel.create({chatId});
+                    await UserModel.findOrCreate({chatId});
                 }
 
                 await bot.sendMessage(chatId, 'Привет! Я чат-бот сообщества бренда Solpro для профессионалов HoReCa. Заполни форму регистрации и получи доступ к закрытой группе с полезной и ценной информацией!' +
