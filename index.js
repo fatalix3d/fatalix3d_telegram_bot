@@ -276,7 +276,7 @@ const start = async () => {
                     return bot.sendMessage(chatId, 'Введите название (именно вывеска):');
 
                 case 'companyLabel':
-                    if (msg.text.length < 2) {
+                    if (msg.text.length < 7) {
                         return bot.sendMessage(chatId, 'Введите название (именно вывеска):');
                     }
                     users[chatId].companyLabel = msg.text;
@@ -285,6 +285,10 @@ const start = async () => {
 
                 case 'companyInn':
                     if (!containsOnlyDigits(msg.text)) {
+                        return bot.sendMessage(chatId, 'ИНН компании:');
+                    }
+
+                    if(msg.text.length < 7){
                         return bot.sendMessage(chatId, 'ИНН компании:');
                     }
 
@@ -426,7 +430,13 @@ async function SaveToDB(chatId){
         where: {chatId: `${chatId}`}
     });
 
-    user.userName = users[chatId].userName;
+    if(!users[chatId].userName){
+        user.userName = 'нет данных';
+    }
+    else{
+        user.userName = users[chatId].userName;
+    }
+
     user.firstName = users[chatId].firstName;
     user.lastName = users[chatId].lastName;
     user.middleName = users[chatId].middleName;

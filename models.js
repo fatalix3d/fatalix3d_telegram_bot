@@ -4,7 +4,7 @@ const {DataTypes} = require('sequelize');
 const User = sequelize.define('user', {
     id:{type : DataTypes.INTEGER, primaryKey:true, unique:true, autoIncrement:true },
     chatId: {type: DataTypes.STRING, unique: false},
-    userName: {type: DataTypes.STRING, unique:true, defaultValue : null},
+    userName: {type: DataTypes.STRING, unique:false, defaultValue : 'нет данных'},
     firstName: {type: DataTypes.STRING, unique:false, defaultValue : 'test'},
     lastName: {type: DataTypes.STRING, unique:false, defaultValue : 'test'},
     middleName: {type: DataTypes.STRING, unique:false, defaultValue : 'test'},
@@ -12,7 +12,7 @@ const User = sequelize.define('user', {
     companyInfo: {type: DataTypes.STRING, unique:false, defaultValue : null},
     companyAdres: {type: DataTypes.STRING, unique:false, defaultValue : null},
     companyLabel: {type: DataTypes.STRING, unique:false, defaultValue : null},
-    companyInn: {type: DataTypes.STRING, unique:true, defaultValue : null},
+    companyInn: {type: DataTypes.STRING, unique:false, defaultValue : null},
     telephone: {type: DataTypes.STRING, unique:false, defaultValue : null},
     city: {type: DataTypes.STRING, unique:false, defaultValue : null},
     aboutChannel: {type: DataTypes.STRING, unique:false, defaultValue : null},
