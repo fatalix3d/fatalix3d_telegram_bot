@@ -504,7 +504,7 @@ async function exportToExcel() {
             Дистрибьютор: user.distributeName,
         }));
 
-        console.log(data);
+        //console.log(data);
 
         // Создаем новую книгу Excel
         const workbook = XLSX.utils.book_new();
